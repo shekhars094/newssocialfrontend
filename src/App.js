@@ -1,11 +1,15 @@
 import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
+import { ThemeProvider } from "@material-ui/core/styles";
+import theme from "./theme";
+import { BrowserRouter as Router } from "react-router-dom";
+import MainRouter from "./MainRouter";
+// import "./App.css";
 
-function App() {
-	return <h1>News Social App !! It Will Be Live
-    Soon !!!!
-  </h1>;
-}
-
+const App = () => (
+	<Router>
+		<ThemeProvider theme={theme}>
+			<MainRouter />
+		</ThemeProvider>
+	</Router>
+);
 export default App;

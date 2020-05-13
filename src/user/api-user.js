@@ -56,18 +56,19 @@ const readUserProfile = async (params, credentials) => {
 
 const updateUserProfile = async (params, credentials, user) => {
 	try {
+		console.log(user);
 		const response = await fetch(
 			`http://localhost:8000/api/users/${params.userId}`,
 			{
 				method: "PUT",
 				headers: {
 					Accept: "application/json",
-					"Content-Type": "application/json",
 					Authorization: `Bearer ${credentials.token}`,
 				},
-				body: JSON.stringify(user),
+				body: user,
 			}
 		);
+
 		return await response.json();
 	} catch (err) {
 		console.log(err);

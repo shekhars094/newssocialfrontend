@@ -65,6 +65,14 @@ const Profile = ({ match }) => {
 		};
 	}, [match.params.userId, token]);
 
+	const photoUrl = user._id
+		? `http://localhost:8000/api/users/photo/${
+				user._id
+		  }?${new Date().getTime()}`
+		: "";
+
+	console.log(photoUrl);
+
 	if (redirectToSignin) {
 		return <Redirect to="/signin" />;
 	}
@@ -76,13 +84,12 @@ const Profile = ({ match }) => {
 			<List dense>
 				<ListItem>
 					<ListItemAvatar>
-						<Avatar>
+						<Avatar src={photoUrl}>
 							<Person />
 						</Avatar>
 					</ListItemAvatar>
 					{console.log(user)}
 					<ListItemText primary={user.name} secondary={user.email} />
-					{console.log(auth.isAuthenticated())}
 					{auth.isAuthenticated().user &&
 						auth.isAuthenticated()._id === user._id && (
 							<ListItemSecondaryAction>
@@ -100,7 +107,8 @@ const Profile = ({ match }) => {
 				<Divider />
 				<ListItem>
 					<ListItemText
-						primary={
+						primary={user.about}
+						secondary={
 							"Joined: " + new Date(user.createdAt).toDateString()
 						}
 					/>

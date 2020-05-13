@@ -39,6 +39,9 @@ const useStyles = makeStyles((theme) => ({
 		margin: "auto",
 		marginBottom: theme.spacing(2),
 	},
+	filename: {
+		marginLeft: "10px",
+	},
 }));
 
 const EditProfile = ({ match }) => {
@@ -48,7 +51,10 @@ const EditProfile = ({ match }) => {
 		password: "",
 		email: "",
 		open: false,
+		photo: "",
+		about: "",
 		error: "",
+		userId: "",
 		redirectToProfile: false,
 	});
 	const { token } = auth.isAuthenticated();
@@ -63,7 +69,6 @@ const EditProfile = ({ match }) => {
 			if (data && data.err) {
 				setValues({ ...values, error: data.err });
 			} else {
-				console.log(data.name);
 				setValues({
 					...values,
 					name: data.name,
@@ -74,11 +79,17 @@ const EditProfile = ({ match }) => {
 	}, [match.params.userId]);
 
 	const clickSubmit = () => {
-		const user = {
-			name: values.name || undefined,
-			email: values.email || undefined,
-			password: values.password || undefined,
-		};
+		console.log({ ...values });
+		const userData = new FormData();
+
+		userData.append("name", values.name);
+		userData.append("email", values.email);
+		userData.append("password", values.password);
+		userData.append("about", values.about);
+		userData.append("photo", values.photo);
+
+		console.log(userData.getAll("name"));
+
 		updateUserProfile(
 			{
 				userId: match.params.userId,
@@ -86,12 +97,11 @@ const EditProfile = ({ match }) => {
 			{
 				token: token,
 			},
-			user
+			userData
 		).then((data) => {
 			if (data && data.err) {
 				setValues({ ...values, error: data.err });
 			} else {
-				console.log(data);
 				setValues({
 					...values,
 					userId: data._id,
@@ -101,9 +111,13 @@ const EditProfile = ({ match }) => {
 		});
 	};
 	const handleChange = (name) => (event) => {
-		setValues({ ...values, [name]: event.target.value });
+		const value =
+			name === "photo" ? event.target.files[0] : event.target.value;
+
+		setValues({ ...values, [name]: value });
 	};
 
+	
 	if (values.redirectToProfile) {
 		return <Redirect to={"/user/" + values.userId} />;
 	}
@@ -113,6 +127,27 @@ const EditProfile = ({ match }) => {
 				<Typography variant="h6" className={classes.title}>
 					Edit Profile
 				</Typography>
+				<br />
+				<input
+					accept="image/*"
+					type="file"
+					onChange={handleChange("photo")}
+					style={{ display: "none" }}
+					id="icon-button-file"
+				/>
+				<label htmlFor="icon-button-file">
+					<Button
+						variant="contained"
+						color="default"
+						component="span">
+						Upload Avatar
+					</Button>
+				</label>
+				<span className={classes.filename}>
+					{values.photo ? values.photo.name : ""}
+				</span>
+
+				<br />
 				<TextField
 					id="name"
 					label="Name"
@@ -133,6 +168,17 @@ const EditProfile = ({ match }) => {
 				/>
 				<br />
 				<TextField
+					id="multiline-flexible"
+					label="About"
+					multiline
+					rows="2"
+					className={classes.textField}
+					value={values.about}
+					onChange={handleChange("about")}
+					margin="normal"
+				/>
+				<br />
+				<TextField
 					id="password"
 					type="password"
 					label="Password"
@@ -141,7 +187,7 @@ const EditProfile = ({ match }) => {
 					onChange={handleChange("password")}
 					margin="normal"
 				/>
-				<br />{" "}
+				<br />
 				{values.error && (
 					<Typography component="p" color="error">
 						<Icon color="error" className={classes.error}>

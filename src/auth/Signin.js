@@ -1,135 +1,90 @@
 import React, { useState } from "react";
-
 import {
-	Card,
-	makeStyles,
-	CardContent,
-	Typography,
-	TextField,
-	CardActions,
-	Icon,
+	Container,
+	Form,
+	Col,
+	FormGroup,
+	Input,
+	Label,
 	Button,
-} from "@material-ui/core";
+} from "reactstrap";
 
-import { Redirect } from "react-router-dom";
 import { signin } from "./api-auth";
 import auth from "./auth-helper";
+import { Redirect } from "react-router";
 
-const useStyles = makeStyles((theme) => ({
-	card: {
-		maxWidth: 600,
-		margin: "auto",
-		textAlign: "center",
-		marginTop: theme.spacing(5),
-		paddingBottom: theme.spacing(2),
-	},
-	error: {
-		verticalAlign: "middle",
-	},
-	title: {
-		marginTop: theme.spacing(2),
-		color: theme.palette.openTitle,
-	},
-	textField: {
-		marginLeft: theme.spacing(1),
-		marginRight: theme.spacing(1),
-		width: 300,
-	},
-	submit: {
-		margin: "auto",
-		marginBottom: theme.spacing(2),
-	},
-}));
-
-const Signin = (props) => {
-	const classes = useStyles();
+const Signin = () => {
 	const [values, setValues] = useState({
 		email: "",
 		password: "",
 		error: "",
-		redirectToReferrer: false,
+		RedirectValue: false,
 	});
 
-	const clickSubmit = () => {
+	const handleChange = (name) => (event) => {
+		event.preventDefault();
+		setValues({ ...values, [name]: event.target.value });
+	};
+
+	const onSubmit = () => {
 		const user = {
 			email: values.email || undefined,
 			password: values.password || undefined,
 		};
 
 		signin(user).then((data) => {
-			if (data.err) {
-				setValues({ ...values, error: data.err });
+			if (data && data.err) {
+				setValues({ ...values, error: data.err, RedirectValue: false });
 			} else {
 				auth.authenticate(data, () => {
-					setValues({
-						...values,
-						error: "",
-						redirectToReferrer: true,
-					});
+					console.log("soe");
+					setValues({ ...values, RedirectValue: true, error: "" });
 				});
 			}
 		});
 	};
 
-	const handleChange = (name) => (event) => {
-		setValues({ ...values, [name]: event.target.value });
-	};
-
-	const { from } = props.location.state || {
-		from: {
-			pathname: "/",
-		},
-	};
-	const { redirectToReferrer } = values;
-	if (redirectToReferrer) {
-		return <Redirect to={from} />;
+	if (values.RedirectValue) {
+		return <Redirect to="/" />;
 	}
 
 	return (
-		<Card className={classes.card}>
-			<CardContent>
-				<Typography variant="h6" className={classes.title}>
-					Sign In
-				</Typography>
-				<TextField
-					id="email"
-					type="email"
-					label="Email"
-					className={classes.textField}
-					value={values.email}
-					onChange={handleChange("email")}
-					margin="normal"
-				/>
-				<br />
-				<TextField
-					id="password"
-					type="password"
-					label="Password"
-					className={classes.textField}
-					value={values.password}
-					onChange={handleChange("password")}
-					margin="normal"
-				/>
-				<br />{" "}
-				{values.error && (
-					<Typography component="p" color="error">
-						<Icon color="error" className={classes.error}>
-							error
-						</Icon>
-						{values.error}
-					</Typography>
-				)}
-			</CardContent>
-			<CardActions>
-				<Button
-					color="primary"
-					variant="contained"
-					onClick={clickSubmit}
-					className={classes.submit}>
-					Submit
-				</Button>
-			</CardActions>
-		</Card>
+		<Container className="container-fluid">
+			<h2 className="text-center">Sign In</h2>
+			<Form className="form">
+				<Col>
+					<FormGroup>
+						<Label for="email">Email</Label>
+						<Input
+							type="email"
+							name="email"
+							id="email"
+							value={values.email}
+							onChange={handleChange("email")}
+							placeholder="some@gmail.com"
+						/>
+					</FormGroup>
+				</Col>
+				<Col>
+					<FormGroup>
+						<Label for="examplePassword">Password</Label>
+						<Input
+							type="password"
+							name="password"
+							id="examplePassword"
+							value={values.password}
+							onChange={handleChange("password")}
+							placeholder="********"
+						/>
+					</FormGroup>
+				</Col>
+				<div className="text-center">
+					<Button color="primary" onClick={onSubmit}>
+						Signin
+					</Button>
+				</div>
+			</Form>
+		</Container>
 	);
 };
 

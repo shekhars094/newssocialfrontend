@@ -1,75 +1,63 @@
 import React from "react";
-import {
-	AppBar,
-	Toolbar,
-	Typography,
-	IconButton,
-	Button,
-} from "@material-ui/core";
 
-import HomeIcon from "@material-ui/icons/Home";
+import { Redirect, Link, withRouter } from "react-router-dom";
 
-import { Link, withRouter } from "react-router-dom";
+import auth from "../auth/auth-helper";
 
-import auth from "./../auth/auth-helper";
+import { Nav, NavItem, NavLink, Navbar, NavbarBrand } from "reactstrap";
 
-const isActive = (history, path) => {
-	if (history.location.pathname === path) {
-		return { color: "#004081" };
-	} else {
-		return { color: "#ffffff" };
-	}
+const Menu = (props) => {
+	return (
+		<Navbar color="light" light expand="md">
+			<NavbarBrand className="ml-4">NewsSocial</NavbarBrand>
+			<Nav className="mr-auto">
+				{!auth.isAuthenticated && (
+					<NavItem>
+						<NavLink>
+							<Link to="/myprofile">MyProfile</Link>
+						</NavLink>
+					</NavItem>
+				)}
+
+				<NavItem>
+					<NavLink>
+						<Link to="/">Home</Link>
+					</NavLink>
+				</NavItem>
+			</Nav>
+			<Nav className="flot-right">
+				{!auth.isAuthenticated() && (
+					<NavItem>
+						<NavLink>
+							<Link to="/signup">Sign UP</Link>
+						</NavLink>
+					</NavItem>
+				)}
+				{!auth.isAuthenticated() && (
+					<NavItem>
+						<NavLink>
+							<Link to="/signin">Sign In</Link>
+						</NavLink>
+					</NavItem>
+				)}
+				{auth.isAuthenticated() && (
+					<NavItem>
+						<NavLink>
+							<Link
+								to="/signout"
+								onClick={() =>
+									auth.deleteJwt(() => {
+										props.history.push("/");
+									})
+								}>
+								Sign Out
+							</Link>
+						</NavLink>
+					</NavItem>
+				)}
+			</Nav>
+		</Navbar>
+	);
 };
-const Menu = withRouter(({ history }) => (
-	<AppBar position="static">
-		<Toolbar>
-			<Typography variant="h6" color="inherit">
-				NewsSocial
-			</Typography>
-			<Link to="/">
-				<IconButton aria-label="Home" style={isActive(history, "/")}>
-					<HomeIcon />
-				</IconButton>
-			</Link>
-			<Link to="/users">
-				<Button style={isActive(history, "/users")}>Users</Button>
-			</Link>
-			{!auth.isAuthenticated() && (
-				<span>
-					<Link to="/signup">
-						<Button style={isActive(history, "/signup")}>
-							Sign up
-						</Button>
-					</Link>
-					<Link to="/signin">
-						<Button style={isActive(history, "/signin")}>
-							Sign In
-						</Button>
-					</Link>
-				</span>
-			)}
-			{auth.isAuthenticated() && (
-				<span>
-					<Link to={"/user/" + auth.isAuthenticated()._id}>
-						<Button
-							style={isActive(
-								history,
-								"/user/" + auth.isAuthenticated()._id
-							)}>
-							My Profile
-						</Button>
-					</Link>
-					<Button
-						color="inherit"
-						onClick={() => {
-							auth.deleteJwt(() => history.push("/"));
-						}}>
-						Sign out
-					</Button>
-				</span>
-			)}
-		</Toolbar>
-	</AppBar>
-));
 
-export default Menu;
+export default withRouter(Menu);

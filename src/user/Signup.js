@@ -1,167 +1,115 @@
 import React, { useState } from "react";
+import {
+	Container,
+	Form,
+	Col,
+	FormGroup,
+	Input,
+	Label,
+	Button,
+} from "reactstrap";
 import { createUser } from "./api-user";
 
-import {
-	Card,
-	makeStyles,
-	CardContent,
-	Typography,
-	TextField,
-	Icon,
-	CardActions,
-	Button,
-	Dialog,
-	DialogTitle,
-	DialogContent,
-	DialogActions,
-	DialogContentText,
-} from "@material-ui/core";
-
-import { Link } from "react-router-dom";
-
-const useStyles = makeStyles((theme) => ({
-	card: {
-		maxWidth: 600,
-		margin: "auto",
-		textAlign: "center",
-		marginTop: theme.spacing(5),
-		paddingBottom: theme.spacing(2),
-	},
-	error: {
-		verticalAlign: "middle",
-	},
-	title: {
-		marginTop: theme.spacing(2),
-		color: theme.palette.openTitle,
-	},
-	textField: {
-		marginLeft: theme.spacing(1),
-		marginRight: theme.spacing(1),
-		width: 300,
-	},
-	submit: {
-		margin: "auto",
-		marginBottom: theme.spacing(2),
-	},
-}));
-
 const Signup = () => {
-	const classes = useStyles();
-
 	const [values, setValues] = useState({
 		name: "",
-		emai: "",
-		user_name: "",
+		email: "",
+		username: "",
 		password: "",
 		error: "",
-		open: false,
+		success: false,
 	});
 
-	const hadnleChange = (name) => (event) => {
+	const handleChange = (name) => (event) => {
+		event.preventDefault();
 		setValues({ ...values, [name]: event.target.value });
 	};
 
-	const clickSubmit = () => {
+	const onsubmit = () => {
 		const user = {
 			name: values.name || undefined,
 			email: values.email || undefined,
-			user_name: values.user_name || undefined,
+			username: values.username || undefined,
 			password: values.password || undefined,
 		};
 		createUser(user).then((data) => {
-			if (data.err) {
+			if (data && data.err) {
 				setValues({ ...values, error: data.err });
 			} else {
-				setValues({ ...values, error: "", open: true });
+				setValues({ ...values, success: true, error: "" });
 			}
+			setValues({
+				name: "",
+				email: "",
+				username: "",
+				password: "",
+			});
 		});
 	};
 
 	return (
-		<div>
-			<Card className={classes.card}>
-				<CardContent>
-					<Typography variant="h6" className={classes.title}>
-						Sign Up
-					</Typography>
-					<TextField
-						id="name"
-						label="Name"
-						className={classes.textField}
-						value={values.name}
-						onChange={hadnleChange("name")}
-						margin="normal"
-					/>
-					<br />
-					<TextField
-						id="email"
-						label="Email"
-						type="email"
-						className={classes.textField}
-						value={values.email}
-						onChange={hadnleChange("email")}
-						margin="normal"
-					/>
-					<br />
-					<TextField
-						id="user_name"
-						type="text"
-						label="Username"
-						className={classes.textField}
-						value={values.user_name}
-						onChange={hadnleChange("user_name")}
-						margin="normal"
-					/>
-					<br />
-					<TextField
-						id="password"
-						label="Password"
-						type="password"
-						className={classes.textField}
-						value={values.password}
-						onChange={hadnleChange("password")}
-						margin="normal"
-					/>
-					<br />
-					{values.error && (
-						<Typography component="p" color="error">
-							<Icon color="error" className={classes.error}>
-								error
-							</Icon>
-							{values.error}
-						</Typography>
-					)}
-				</CardContent>
-
-				<CardActions>
-					<Button
-						color="primary"
-						variant="contained"
-						onClick={clickSubmit}
-						className={classes.submit}>
-						Submit
+		<Container className="container-fluid">
+			<h2 className="text-center">Sign Up</h2>
+			<Form className="form">
+				<Col>
+					<FormGroup>
+						<Label for="name">Name</Label>
+						<Input
+							type="name"
+							name="name"
+							id="name"
+							value={values.name}
+							onChange={handleChange("name")}
+							placeholder="Shashi Shekhar"
+						/>
+					</FormGroup>
+				</Col>
+				<Col>
+					<FormGroup>
+						<Label for="email">Email</Label>
+						<Input
+							type="email"
+							name="email"
+							id="email"
+							value={values.email}
+							onChange={handleChange("email")}
+							placeholder="some@gmail.com"
+						/>
+					</FormGroup>
+				</Col>
+				<Col>
+					<FormGroup>
+						<Label for="username">Username</Label>
+						<Input
+							type="text"
+							name="username"
+							id="username"
+							value={values.username}
+							onChange={handleChange("username")}
+							placeholder="power22"
+						/>
+					</FormGroup>
+				</Col>
+				<Col>
+					<FormGroup>
+						<Label for="examplePassword">Password</Label>
+						<Input
+							type="password"
+							name="password"
+							id="examplePassword"
+							value={values.password}
+							onChange={handleChange("password")}
+							placeholder="********"
+						/>
+					</FormGroup>
+				</Col>
+				<div className="text-center">
+					<Button color="primary" onClick={onsubmit}>
+						SignUp
 					</Button>
-				</CardActions>
-			</Card>
-			<Dialog open={values.open} disableBackdropClick={true}>
-				<DialogTitle>New Account</DialogTitle>
-				<DialogContent>
-					<DialogContentText>
-						New account successfully created.
-					</DialogContentText>
-				</DialogContent>
-				<DialogActions>
-					<Link to="/signin">
-						<Button
-							color="primary"
-							autoFocus="autoFocus"
-							variant="contained">
-							Sign In
-						</Button>
-					</Link>
-				</DialogActions>
-			</Dialog>
-		</div>
+				</div>
+			</Form>
+		</Container>
 	);
 };
 

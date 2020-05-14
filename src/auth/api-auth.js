@@ -1,8 +1,10 @@
 // Signin Logic
 
+import { API } from "../backend";
+
 const signin = async (user) => {
 	try {
-		const response = await fetch(`http://localhost:8000/api/auth/signin`, {
+		const response = await fetch(`${API}/auth/signin`, {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
@@ -21,7 +23,7 @@ const signin = async (user) => {
 
 const signout = async () => {
 	try {
-		const response = await fetch(`/api/auth/signout`, { method: "GET" });
+		const response = await fetch(`${API}/auth/signout`, { method: "GET" });
 		return await response.json();
 	} catch (err) {
 		console.log(err);
